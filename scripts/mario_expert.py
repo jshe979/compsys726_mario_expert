@@ -73,12 +73,20 @@ class MarioController(MarioEnvironment):
         """
 
         # Simply toggles the buttons being on or off for a duration of act_freq
-        self.pyboy.send_input(self.valid_actions[action])
+        if (action == 6):
+            self.pyboy.send_input(self.valid_actions[2])
+            self.pyboy.send_input(self.valid_actions[4])
+        else:
+            self.pyboy.send_input(self.valid_actions[action])
 
         for _ in range(self.act_freq):
             self.pyboy.tick()
 
-        self.pyboy.send_input(self.release_button[action])
+        if (action == 6):
+            self.pyboy.send_input(self.release_button[2])
+            self.pyboy.send_input(self.release_button[4])
+        else:
+            self.pyboy.send_input(self.release_button[action])
 
 
 class MarioExpert:
@@ -105,35 +113,47 @@ class MarioExpert:
         action = 0
         game_area = self.environment.game_area()
         
+        DOWN = 0
         LEFT = 1
         RIGHT = 2
         JUMP = 4
+        JUMP_RIGHT = 6
         GOOMBA = 15
         KUMO = 18
         
         # Implement your code here to choose the best action
 
+        print(game_area)
+
         if (1 in game_area):
             mario = self.get_player_position()
-            
-            if(GOOMBA in game_area):
+
+            if(mario[1] == 19):
+                action = RIGHT
+            elif(GOOMBA in game_area):
                 goomba_position = self.get_obstacle_position(GOOMBA)
-                if((game_area[mario[0]][mario[1]+2] == GOOMBA) or (game_area[mario[0]][mario[1]+3] == GOOMBA) or (game_area[mario[0]][mario[1]-2] == GOOMBA) or (game_area[mario[0]][mario[1]+1] != 0)):
+                # Jump logic for Goomba encounters
+                if((game_area[mario[0]][mario[1]+2] == GOOMBA) or   # If Goomba is in front of Mario
+                   (game_area[mario[0]][mario[1]+3] == GOOMBA) or 
+                   (game_area[mario[0]][mario[1]-1] == GOOMBA) or # If Goomba is behind Mario
+                    (game_area[mario[0]][mario[1]-2] == GOOMBA) or  
+                   (game_area[mario[0]][mario[1]+1] != 0)):
                     action = JUMP
-                elif(any(game_area[:, mario[1]-1] == GOOMBA) or (game_area[mario[0]][mario[1]+4] == 10)):
+                elif(any(game_area[:, mario[1]-1] == GOOMBA) or (game_area[mario[0]][mario[1]+4] == 10)): # Give some space for goomba to approach
                     action = LEFT
-                elif((any(game_area[mario[0]] == GOOMBA)) or (goomba_position[0] > mario[0])):
+                elif((any(game_area[mario[0]] == GOOMBA)) or (goomba_position[0] > mario[0])): # If same level as goomba or goomba is below Mario
                     if(goomba_position[0] > mario[0]):
-                        if((goomba_position[1] - mario[1] > 3)):
+                        if((goomba_position[1] - mario[1] > 3)): # Keep moving if Goomba is far away
                             action = RIGHT
-                        elif((goomba_position[1] - mario[1] < -3)):
+                        elif((goomba_position[1] - mario[1] < -3)): # Go to the left goomba 
                             action = LEFT
-                    elif (goomba_position[1] < mario[1]):
+                    elif (mario[1] - goomba_position[1] > 0): # Go back if goomba is missed
                         action = LEFT
                     else:
                         action = RIGHT
             elif (KUMO in game_area):
                 kumo_position = self.get_obstacle_position(KUMO)
+
                 if ((game_area[mario[0]][mario[1]+1] == KUMO)):
                     action = JUMP
                 elif ((any(game_area[mario[0]] == KUMO)) or (kumo_position[0] > mario[0])):
@@ -147,8 +167,12 @@ class MarioExpert:
                 else:
                     action = LEFT
             else:  
-                if ((game_area[mario[0]][mario[1]+1] != 0) or (game_area[14][mario[1]+1] == 0)):
+                if ((game_area[mario[0]][mario[1]+1] != 0)):
                     action = JUMP
+                    if ((game_area[mario[0]][mario[1]+1] == 5)):
+                        action = RIGHT
+                elif (game_area[14][mario[1]+1] == 0):
+                    action = JUMP_RIGHT
                 else:
                     action = RIGHT
 
