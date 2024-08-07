@@ -123,8 +123,6 @@ class MarioExpert:
         
         # Implement your code here to choose the best action
 
-        print(game_area)
-
         if (1 in game_area):
             mario = self.get_player_position()
 
@@ -133,7 +131,7 @@ class MarioExpert:
             elif(mario[0] == 15):
                 action = DOWN
             elif(GOOMBA in game_area):
-                goomba_position = self.get_obstacle_position(GOOMBA)
+                goomba_position = self.get_obstacle_position(GOOMBA)    # Obtain location of goomba on screen
                 # Jump logic for Goomba encounters
                 if((game_area[mario[0]][mario[1]+2] == GOOMBA) or   # If Goomba is in front of Mario
                    (game_area[mario[0]][mario[1]+3] == GOOMBA) or 
@@ -153,12 +151,12 @@ class MarioExpert:
                         action = LEFT
                     else:
                         action = RIGHT
-            elif (KUMO in game_area):
-                kumo_position = self.get_obstacle_position(KUMO)
+            elif (KUMO in game_area):   
+                kumo_position = self.get_obstacle_position(KUMO)    # Obtain position of Kumo
 
-                if ((game_area[mario[0]][mario[1]+1] == KUMO)):
+                if ((game_area[mario[0]][mario[1]+1] == KUMO)): # Jump if Kumo detected in front of Mario
                     action = JUMP
-                elif ((any(game_area[mario[0]] == KUMO)) or (kumo_position[0] > mario[0])):
+                elif ((any(game_area[mario[0]] == KUMO)) or (kumo_position[0] > mario[0])): #  Determine direction of movement
                     if(kumo_position[0] > mario[0]):
                         if((kumo_position[1] - mario[1] < -3)):
                             action = LEFT
@@ -169,14 +167,14 @@ class MarioExpert:
                 else:
                     action = LEFT
             else:  
-                if ((game_area[mario[0]][mario[1]+1] != 0)):
+                if ((game_area[mario[0]][mario[1]+1] != 0)):    # Jump if obstacle is detected
                     action = JUMP
-                    if ((game_area[mario[0]][mario[1]+1] == 5)):
+                    if ((game_area[mario[0]][mario[1]+1] == 5)): # Continue moving if obstacle is a coin
                         action = RIGHT
-                elif (game_area[15][mario[1]+1] == 0):
+                elif (game_area[15][mario[1]+1] == 0):  # Jump if there is a gap detected
                     action = JUMP_RIGHT
                 else:
-                    action = RIGHT
+                    action = RIGHT  # Move right
 
         return action
     
@@ -199,13 +197,13 @@ class MarioExpert:
             for col in range(cols - 1):
             # Check if top-left corner is 1
                 if game_area[row][col] == 1:
-                # Check if all elements within the player's 2x2 matrix are 1s
+                # Check if all elements within the Mario's 2x2 matrix are 1s
                     if (game_area[row][col + 1] == 1 and
                         game_area[row + 1][col] == 1 and
                         game_area[row + 1][col + 1] == 1):
                         return row + 1, col + 1  # Bottom-right corner
 
-        # Player (2x2 matrix of 1s) not found in the game area
+        # Mario (2x2 matrix of 1s) not found in the game area
         return (1,1)
     
     def get_obstacle_position(self, obstacle_value):
