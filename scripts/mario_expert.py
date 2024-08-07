@@ -105,11 +105,11 @@ class MarioExpert:
         action = 0
         game_area = self.environment.game_area()
         
-        DOWN = 0
         LEFT = 1
         RIGHT = 2
         JUMP = 4
         GOOMBA = 15
+        KUMO = 18
         
         # Implement your code here to choose the best action
 
@@ -117,18 +117,35 @@ class MarioExpert:
             mario = self.get_player_position()
             
             if(GOOMBA in game_area):
-                position = self.get_obstacle_position(GOOMBA)
-                print(position)
-                if((game_area[mario[0]][mario[1]+2] == GOOMBA) or (game_area[mario[0]][mario[1]+3] == GOOMBA) or (game_area[mario[0]][mario[1]+1] != 0)):
+                goomba_position = self.get_obstacle_position(GOOMBA)
+                if((game_area[mario[0]][mario[1]+2] == GOOMBA) or (game_area[mario[0]][mario[1]+3] == GOOMBA) or (game_area[mario[0]][mario[1]-2] == GOOMBA) or (game_area[mario[0]][mario[1]+1] != 0)):
                     action = JUMP
                 elif(any(game_area[:, mario[1]-1] == GOOMBA) or (game_area[mario[0]][mario[1]+4] == 10)):
                     action = LEFT
-                elif((any(game_area[mario[0]] == GOOMBA)) or (position[0] > mario[0])):
-                    if(position[0] > mario[0]):
-                        if((position[1] - mario[1] > 3)):
+                elif((any(game_area[mario[0]] == GOOMBA)) or (goomba_position[0] > mario[0])):
+                    if(goomba_position[0] > mario[0]):
+                        if((goomba_position[1] - mario[1] > 3)):
+                            action = RIGHT
+                        elif((goomba_position[1] - mario[1] < -3)):
+                            action = LEFT
+                    elif (goomba_position[1] < mario[1]):
+                        action = LEFT
+                    else:
+                        action = RIGHT
+            elif (KUMO in game_area):
+                kumo_position = self.get_obstacle_position(KUMO)
+                if ((game_area[mario[0]][mario[1]+1] == KUMO)):
+                    action = JUMP
+                elif ((any(game_area[mario[0]] == KUMO)) or (kumo_position[0] > mario[0])):
+                    if(kumo_position[0] > mario[0]):
+                        if((kumo_position[1] - mario[1] < -3)):
+                            action = LEFT
+                        else:
                             action = RIGHT
                     else:
                         action = RIGHT
+                else:
+                    action = LEFT
             else:  
                 if ((game_area[mario[0]][mario[1]+1] != 0) or (game_area[14][mario[1]+1] == 0)):
                     action = JUMP
