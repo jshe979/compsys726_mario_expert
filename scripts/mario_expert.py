@@ -30,7 +30,7 @@ class MarioController(MarioEnvironment):
     def __init__(
         self,
         act_freq: int = 10,
-        emulation_speed: int = 0,
+        emulation_speed: int = 1,
         headless: bool = False,
     ) -> None:
         super().__init__(
@@ -102,13 +102,91 @@ class MarioExpert:
         self.video = None
 
     def choose_action(self):
-        state = self.environment.game_state()
-        frame = self.environment.grab_frame()
+        action = 0
+        game_area = self.environment.game_area()
+        
+        DOWN = 0
+        LEFT = 1
+        RIGHT = 2
+        JUMP = 4
+        GOOMBA = 15
+        
+        # Implement your code here to choose the best action
+
+        if (1 in game_area):
+            mario = self.get_player_position()
+            
+            if(GOOMBA in game_area):
+                position = self.get_obstacle_position(GOOMBA)
+                print(position)
+                if((game_area[mario[0]][mario[1]+2] == GOOMBA) or (game_area[mario[0]][mario[1]+3] == GOOMBA) or (game_area[mario[0]][mario[1]+1] != 0)):
+                    action = JUMP
+                elif(any(game_area[:, mario[1]-1] == GOOMBA) or (game_area[mario[0]][mario[1]+4] == 10)):
+                    action = LEFT
+                elif((any(game_area[mario[0]] == GOOMBA)) or (position[0] > mario[0])):
+                    if(position[0] > mario[0]):
+                        if((position[1] - mario[1] > 3)):
+                            action = RIGHT
+                    else:
+                        action = RIGHT
+            else:  
+                if ((game_area[mario[0]][mario[1]+1] != 0) or (game_area[14][mario[1]+1] == 0)):
+                    action = JUMP
+                else:
+                    action = RIGHT
+
+        return action
+    
+    def get_player_position(self):
+        """
+        Finds the bottom-right corner of the player's position (2x2 matrix of 1s) in the game area.
+
+        Args:
+            self: An instance of the agent class.
+
+        Returns:
+            A tuple containing the row and column index of the bottom-right corner of the player 
+            (2x2 matrix of 1s), or None if not found.
+        """
+        game_area = self.environment.game_area()
+        rows, cols = len(game_area), len(game_area[0])  # Get dimensions of the game area
+
+         # Iterate through all possible bottom-right corners
+        for row in range(rows - 1):
+            for col in range(cols - 1):
+            # Check if top-left corner is 1
+                if game_area[row][col] == 1:
+                # Check if all elements within the player's 2x2 matrix are 1s
+                    if (game_area[row][col + 1] == 1 and
+                        game_area[row + 1][col] == 1 and
+                        game_area[row + 1][col + 1] == 1):
+                        return row + 1, col + 1  # Bottom-right corner
+
+        # Player (2x2 matrix of 1s) not found in the game area
+        return (1,1)
+    
+    def get_obstacle_position(self, obstacle_value):
+        """
+        Finds the position (row, col) of the first occurrence of an obstacle in the game area.
+
+        Args:
+            self: An instance of the agent class.
+            obstacle_value: The value representing the obstacle in the game area.
+
+        Returns:
+            A tuple containing the row and column index of the obstacle, or None if not found.
+        """
         game_area = self.environment.game_area()
 
-        # Implement your code here to choose the best action
-        # time.sleep(0.1)
-        return random.randint(0, len(self.environment.valid_actions) - 1)
+        for row, row_data in enumerate(game_area):
+            for col, value in enumerate(row_data):
+                if value == obstacle_value:
+                    return row, col
+
+        # Obstacle not found
+        return None
+
+
 
     def step(self):
         """
