@@ -30,7 +30,7 @@ class MarioController(MarioEnvironment):
     def __init__(
         self,
         act_freq: int = 10,
-        emulation_speed: int = 1,
+        emulation_speed: int = 0,
         headless: bool = False,
     ) -> None:
         super().__init__(
@@ -130,6 +130,8 @@ class MarioExpert:
 
             if(mario[1] == 19):
                 action = RIGHT
+            elif(mario[0] == 15):
+                action = DOWN
             elif(GOOMBA in game_area):
                 goomba_position = self.get_obstacle_position(GOOMBA)
                 # Jump logic for Goomba encounters
@@ -171,7 +173,7 @@ class MarioExpert:
                     action = JUMP
                     if ((game_area[mario[0]][mario[1]+1] == 5)):
                         action = RIGHT
-                elif (game_area[14][mario[1]+1] == 0):
+                elif (game_area[15][mario[1]+1] == 0):
                     action = JUMP_RIGHT
                 else:
                     action = RIGHT
