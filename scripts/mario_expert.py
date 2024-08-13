@@ -30,7 +30,7 @@ class MarioController(MarioEnvironment):
     def __init__(
         self,
         act_freq: int = 10,
-        emulation_speed: int = 0,
+        emulation_speed: int = 1,
         headless: bool = False,
     ) -> None:
         super().__init__(
@@ -112,14 +112,18 @@ class MarioExpert:
     def choose_action(self):
         action = 0
         game_area = self.environment.game_area()
+
+        print(game_area)
         
         DOWN = 0
         LEFT = 1
         RIGHT = 2
         JUMP = 4
         JUMP_RIGHT = 6
-        GOOMBA = 15
+        CHIBIBO = 15
+        NOKOBON = 16
         KUMO = 18
+        BUNBUN = 19
         
         # Implement your code here to choose the best action
 
@@ -130,27 +134,50 @@ class MarioExpert:
                 action = RIGHT
             elif(mario[0] == 15):
                 action = DOWN
-            elif(GOOMBA in game_area):
-                goomba_position = self.get_obstacle_position(GOOMBA)    # Obtain location of goomba on screen
+            elif(CHIBIBO in game_area):
+                chibibo_position = self.get_obstacle_position(CHIBIBO)    # Obtain location of goomba on screen
                 # Jump logic for Goomba encounters
-                if((game_area[mario[0]][mario[1]+2] == GOOMBA) or   # If Goomba is in front of Mario
-                   (game_area[mario[0]][mario[1]+3] == GOOMBA) or 
-                   (game_area[mario[0]][mario[1]-1] == GOOMBA) or # If Goomba is behind Mario
-                    (game_area[mario[0]][mario[1]-2] == GOOMBA) or  
+                if((game_area[mario[0]][mario[1]+2] == CHIBIBO) or   # If Goomba is in front of Mario
+                   (game_area[mario[0]][mario[1]+3] == CHIBIBO) or 
+                   (game_area[mario[0]][mario[1]-1] == CHIBIBO) or # If Goomba is behind Mario
+                    (game_area[mario[0]][mario[1]-2] == CHIBIBO) or  
                    (game_area[mario[0]][mario[1]+1] != 0)):
                     action = JUMP
-                elif(any(game_area[:, mario[1]-1] == GOOMBA) or (game_area[mario[0]][mario[1]+4] == 10)): # Give some space for goomba to approach
+                elif(any(game_area[:, mario[1]-1] == CHIBIBO) or (game_area[mario[0]][mario[1]+4] == 10)): # Give some space for goomba to approach
                     action = LEFT
-                elif((any(game_area[mario[0]] == GOOMBA)) or (goomba_position[0] > mario[0])): # If same level as goomba or goomba is below Mario
-                    if(goomba_position[0] > mario[0]):
-                        if((goomba_position[1] - mario[1] > 3)): # Keep moving if Goomba is far away
+                elif((any(game_area[mario[0]] == CHIBIBO)) or (chibibo_position[0] > mario[0])): # If same level as goomba or goomba is below Mario
+                    if(chibibo_position[0] > mario[0]):
+                        if((chibibo_position[1] - mario[1] > 3)): # Keep moving if Goomba is far away
                             action = RIGHT
-                        elif((goomba_position[1] - mario[1] < -3)): # Go to the left goomba 
+                        elif((chibibo_position[1] - mario[1] < -3)): # Go to the left goomba 
                             action = LEFT
-                    elif (mario[1] - goomba_position[1] > 0): # Go back if goomba is missed
+                    elif (mario[1] - chibibo_position[1] > 0): # Go back if goomba is missed
                         action = LEFT
                     else:
                         action = RIGHT
+            elif(NOKOBON in game_area):
+                nokobon_position = self.get_obstacle_position(NOKOBON)    # Obtain location of nokobon on screen
+                # Jump logic for Goomba encounters
+                if((game_area[mario[0]][mario[1]+2] == NOKOBON) or   # If nokobon is in front of Mario
+                   (game_area[mario[0]][mario[1]+3] == NOKOBON) or 
+                   (game_area[mario[0]][mario[1]-1] == NOKOBON) or # If nokobon is behind Mario
+                    (game_area[mario[0]][mario[1]-2] == NOKOBON) or  
+                   (game_area[mario[0]][mario[1]+1] != 0)):
+                    action = JUMP
+                elif(any(game_area[:, mario[1]-1] == NOKOBON) or (game_area[mario[0]][mario[1]+4] == 10)): # Give some space for nokobon to approach
+                    action = LEFT
+                elif((any(game_area[mario[0]] == NOKOBON)) or (nokobon_position[0] > mario[0])): # If same level as nokobon or nokobon is below Mario
+                    if(nokobon_position[0] > mario[0]):
+                        if((nokobon_position[1] - mario[1] > 3)): # Keep moving if Goomba is far away
+                            action = RIGHT
+                        elif((nokobon_position[1] - mario[1] < -3)): # Go to the left goomba 
+                            action = LEFT
+                    elif (mario[1] - nokobon_position[1] > 0): # Go back if goomba is missed
+                        action = LEFT
+                    else:
+                        action = JUMP_RIGHT
+                else:
+                    action = JUMP_RIGHT
             elif (KUMO in game_area):   
                 kumo_position = self.get_obstacle_position(KUMO)    # Obtain position of Kumo
 
@@ -166,15 +193,23 @@ class MarioExpert:
                         action = RIGHT
                 else:
                     action = LEFT
+            elif (BUNBUN in game_area):
+                BUNBUN = self.get_obstacle_position(BUNBUN) # Obtain position of Kumo
+
+                if(any(game_area[mario[0]][mario[1]+2] == BUNBUN)):
+                    action = JUMP_RIGHT
             else:  
                 if ((game_area[mario[0]][mario[1]+1] != 0)):    # Jump if obstacle is detected
                     action = JUMP
                     if ((game_area[mario[0]][mario[1]+1] == 5)): # Continue moving if obstacle is a coin
                         action = RIGHT
+                elif (game_area[mario[0]+1][mario[1]+1] == 10):
+                    action = RIGHT  # Move right
                 elif (game_area[15][mario[1]+1] == 0):  # Jump if there is a gap detected
                     action = JUMP_RIGHT
                 else:
-                    action = RIGHT  # Move right
+                    action = RIGHT
+                
 
         return action
     
