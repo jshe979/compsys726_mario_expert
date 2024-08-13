@@ -112,8 +112,6 @@ class MarioExpert:
     def choose_action(self):
         action = 0
         game_area = self.environment.game_area()
-
-        print(game_area)
         
         DOWN = 0
         LEFT = 1
@@ -157,9 +155,8 @@ class MarioExpert:
                         action = RIGHT
             elif(NOKOBON in game_area):
                 nokobon_position = self.get_obstacle_position(NOKOBON)    # Obtain location of nokobon on screen
-                # Jump logic for Goomba encounters
-                if((game_area[mario[0]][mario[1]+2] == NOKOBON) or   # If nokobon is in front of Mario
-                   (game_area[mario[0]][mario[1]+3] == NOKOBON) or 
+                # Jump logic for Nokobon encounters
+                if((game_area[mario[0]][mario[1]+1] == NOKOBON) or   # If nokobon is in front of Mario
                    (game_area[mario[0]][mario[1]-1] == NOKOBON) or # If nokobon is behind Mario
                     (game_area[mario[0]][mario[1]-2] == NOKOBON) or  
                    (game_area[mario[0]][mario[1]+1] != 0)):
@@ -168,11 +165,11 @@ class MarioExpert:
                     action = LEFT
                 elif((any(game_area[mario[0]] == NOKOBON)) or (nokobon_position[0] > mario[0])): # If same level as nokobon or nokobon is below Mario
                     if(nokobon_position[0] > mario[0]):
-                        if((nokobon_position[1] - mario[1] > 3)): # Keep moving if Goomba is far away
+                        if((nokobon_position[1] - mario[1] > 3)): # Keep moving if Nokobon is far away
                             action = RIGHT
-                        elif((nokobon_position[1] - mario[1] < -3)): # Go to the left goomba 
+                        elif((nokobon_position[1] - mario[1] < -3)): # Go to the left Nokobon 
                             action = LEFT
-                    elif (mario[1] - nokobon_position[1] > 0): # Go back if goomba is missed
+                    elif (mario[1] - nokobon_position[1] > 0): # Go back if nokobon is missed
                         action = LEFT
                     else:
                         action = JUMP_RIGHT
