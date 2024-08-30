@@ -191,7 +191,7 @@ class MarioExpert:
                 else:
                     action = LEFT
             elif (BUNBUN in game_area):
-                BUNBUN = self.get_obstacle_position(BUNBUN) # Obtain position of Kumo
+                BUNBUN = self.get_obstacle_position(BUNBUN) # Obtain position of Bunbun
 
                 if(any(game_area[mario[0]][mario[1]+2] == BUNBUN)):
                     action = JUMP_RIGHT
